@@ -1,0 +1,11 @@
+行番号,describeブロック名,期待結果,テストケース,結果
+,TestApp,TestAppコンポーネントが描画される,TestAppコンポーネントが描画される,passed
+,TestApp,Appクラス名のdivが存在する,Appクラス名のdivが存在する,passed
+,TestApp,reportWebVitalsが呼ばれる,reportWebVitalsが呼ばれる,passed
+5,TestApp,初期表示でタスクがない場合、"タスクはありません"と表示される,初期表示でタスクがない場合、"タスクはありません"と表示される,passed
+10,TestApp,タスクを追加できる,タスクを追加できる,passed
+18,TestApp,空欄で追加しようとするとアラートが表示される,空欄で追加しようとするとアラートが表示される,passed
+25,TestApp,タスクを完了状態にできる,タスクを完了状態にできる,passed
+35,TestApp,タスクを削除できる,タスクを削除できる,passed
+44,TestApp,フィルターで未完了・完了タスクを切り替えられる,フィルターで未完了・完了タスクを切り替えられる,passed
+,TestApp,バージョン情報が表示される,バージョン情報が表示される,passed
