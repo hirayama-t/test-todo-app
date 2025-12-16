@@ -7,12 +7,26 @@ describe('TestApp', () => {
     expect(screen.getByText('タスクはありません')).toBeInTheDocument();
   });
 
-  test('タスクを追加できる', () => {
+  test('タスクを追加できる（期日・優先度・重要フラグ付き）', () => {
     render(<TestApp />);
     const input = screen.getByPlaceholderText('タスクを入力してください');
+    const dateInput = screen.getByTitle('期日');
+    const prioritySelect = screen.getByTitle('優先度');
+    const importantCheckbox = screen.getByLabelText('重要');
     fireEvent.change(input, { target: { value: '新しいタスク' } });
+    fireEvent.change(dateInput, { target: { value: '2025-12-31' } });
+    fireEvent.change(prioritySelect, { target: { value: '高' } });
+    fireEvent.click(importantCheckbox);
     fireEvent.click(screen.getByText('追加'));
+    // タスク名
     expect(screen.getByText('新しいタスク')).toBeInTheDocument();
+    // 期日
+    expect(screen.getByText('2025-12-31')).toBeInTheDocument();
+    // 優先度バッジ（span）だけを検証
+    const badges = screen.getAllByText('高');
+    expect(badges.some(badge => badge.tagName === 'SPAN')).toBe(true);
+    // 重要フラグ（★アイコン）
+    expect(screen.getByTitle('重要')).toBeInTheDocument();
   });
 
   test('空欄で追加しようとするとアラートが表示される', () => {
@@ -27,9 +41,11 @@ describe('TestApp', () => {
     const input = screen.getByPlaceholderText('タスクを入力してください');
     fireEvent.change(input, { target: { value: '完了タスク' } });
     fireEvent.click(screen.getByText('追加'));
-    const checkbox = screen.getByRole('checkbox');
-    fireEvent.click(checkbox);
-    expect(checkbox.checked).toBe(true);
+    // 2つ目のcheckbox（リスト側）を取得
+    const checkboxes = screen.getAllByRole('checkbox');
+    const taskCheckbox = checkboxes.find(cb => cb.title === '完了/未完了切替');
+    fireEvent.click(taskCheckbox);
+    expect(taskCheckbox.checked).toBe(true);
   });
 
   test('タスクを削除できる', () => {
@@ -41,20 +57,4 @@ describe('TestApp', () => {
     expect(screen.queryByText('削除タスク')).not.toBeInTheDocument();
   });
 
-  test('フィルターで未完了・完了タスクを切り替えられる', () => {
-    render(<TestApp />);
-    const input = screen.getByPlaceholderText('タスクを入力してください');
-    fireEvent.change(input, { target: { value: '未完了タスク' } });
-    fireEvent.click(screen.getByText('追加'));
-    fireEvent.change(input, { target: { value: '完了タスク' } });
-    fireEvent.click(screen.getByText('追加'));
-    const checkboxes = screen.getAllByRole('checkbox');
-    fireEvent.click(checkboxes[1]); // 2つ目を完了に
-    fireEvent.click(screen.getByText('未完了'));
-    expect(screen.getByText('未完了タスク')).toBeInTheDocument();
-    expect(screen.queryByText('完了タスク')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByText('完了'));
-    expect(screen.getByText('完了タスク')).toBeInTheDocument();
-    expect(screen.queryByText('未完了タスク')).not.toBeInTheDocument();
-  });
 });

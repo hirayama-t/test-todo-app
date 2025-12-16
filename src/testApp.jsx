@@ -6,6 +6,9 @@ import "./testApp.css";
 function TestApp() {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
+  const [due, setDue] = useState("");
+  const [priority, setPriority] = useState("中");
+  const [important, setImportant] = useState(false);
   const [filter, setFilter] = useState("all"); // all, active, completed
 
   // --- バリデーションチェック関数（リファクタリング後） ---
@@ -17,17 +20,25 @@ function TestApp() {
   // タスク追加
   function handleAddTask(e) {
     e.preventDefault();
-    // --- バリデーションチェック関数を呼び出し ---
     if (!validateTaskInput(input)) {
-      // --- 空欄の場合はアラートを表示 ---
       alert("タスク内容を入力してください。");
       return;
     }
     setTasks([
       ...tasks,
-      { id: Date.now(), text: input, completed: false },
+      {
+        id: Date.now(),
+        text: input,
+        due: due,
+        priority: priority,
+        important: important,
+        completed: false
+      },
     ]);
     setInput("");
+    setDue("");
+    setPriority("中");
+    setImportant(false);
   }
 
   // タスク完了切替
@@ -89,14 +100,43 @@ function TestApp() {
           onClick={() => setFilter("completed")}
         >完了 <span className="badge bg-secondary ms-1">{completedCount}</span></button>
       </div>
-      <form onSubmit={handleAddTask} className="todo-form mt-3">
+      <form onSubmit={handleAddTask} className="todo-form mt-3" style={{flexWrap: 'wrap'}}>
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="タスクを入力してください"
           className="todo-input form-control"
+          style={{minWidth: '120px'}}
         />
+        <input
+          type="date"
+          value={due}
+          onChange={(e) => setDue(e.target.value)}
+          className="form-control"
+          style={{minWidth: '120px'}}
+          title="期日"
+        />
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          className="form-control"
+          style={{minWidth: '90px'}}
+          title="優先度"
+        >
+          <option value="高">高</option>
+          <option value="中">中</option>
+          <option value="低">低</option>
+        </select>
+        <label className="form-check-label" style={{margin: '0 8px', whiteSpace: 'nowrap'}}>
+          <input
+            type="checkbox"
+            className="form-check-input"
+            checked={important}
+            onChange={(e) => setImportant(e.target.checked)}
+            style={{marginRight: '4px'}}
+          />重要
+        </label>
         <button type="submit" className="add-btn btn btn-primary">追加</button>
       </form>
       <ul className="todo-list mt-3">
@@ -104,7 +144,7 @@ function TestApp() {
           <li className="text-center text-muted">タスクはありません</li>
         )}
         {filteredTasks.map((task) => (
-          <li key={task.id} className={task.completed ? "completed" : ""}>
+          <li key={task.id} className={task.completed ? "completed" : ""} style={{alignItems: 'center'}}>
             <input
               type="checkbox"
               className="form-check-input me-2"
@@ -113,7 +153,16 @@ function TestApp() {
               title="完了/未完了切替"
             />
             <span style={{ flex: 1 }}>
+              {task.important && <span title="重要" style={{color: '#e53935', fontWeight: 'bold', marginRight: 4}}>★</span>}
               {task.text}
+              {task.due && (
+                <span className="badge bg-light text-dark ms-2" title="期日" style={{border: '1px solid #ccc', fontSize: '12px'}}>
+                  {task.due}
+                </span>
+              )}
+              <span className="badge bg-info text-dark ms-2" title="優先度" style={{fontSize: '12px'}}>
+                {task.priority || '中'}
+              </span>
             </span>
             <button
               onClick={() => handleDeleteTask(task.id)}
