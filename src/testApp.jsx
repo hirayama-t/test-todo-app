@@ -8,10 +8,21 @@ function TestApp() {
   const [input, setInput] = useState("");
   const [filter, setFilter] = useState("all"); // all, active, completed
 
+  // --- バリデーションチェック関数（リファクタリング後） ---
+  function validateTaskInput(value) {
+    return typeof value === "string" && value.trim() !== "";
+  }
+  // --- バリデーションチェック関数（リファクタリング後） ---
+
   // タスク追加
   function handleAddTask(e) {
     e.preventDefault();
-    if (input.trim() === "") return;
+    // --- バリデーションチェック関数を呼び出し ---
+    if (!validateTaskInput(input)) {
+      // --- 空欄の場合はアラートを表示 ---
+      alert("タスク内容を入力してください。");
+      return;
+    }
     setTasks([
       ...tasks,
       { id: Date.now(), text: input, completed: false },
@@ -43,17 +54,21 @@ function TestApp() {
     return tasks;
   }
 
+  // バージョン情報を追加する
+  const version = "1.0.0";
+
   // 件数カウント
   const allCount = tasks.length;
   const activeCount = tasks.filter((task) => !task.completed).length;
   const completedCount = tasks.filter((task) => task.completed).length;
 
   const filteredTasks = getFilteredTasks();
-
   return (
     <div className="todo-container shadow">
       <div className="header">
         <h2 className="mb-0">業務用Todo管理アプリ</h2>
+        {/* * バージョン情報表示 * */}
+        <span className="version-info">v{version}</span>
         <p className="text-secondary mb-0" style={{fontSize: "15px"}}>タスクの追加・完了・削除ができます</p>
       </div>
       {/* フィルターボタン＋件数 */}
